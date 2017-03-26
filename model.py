@@ -3,9 +3,16 @@ import csv
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D, Convolution2D
 import random
+import sys
+
+datadir = 'data'
+if len(sys.argv) > 1:
+    datadir = str(sys.argv[1])
+
+print ('Using images from:', datadir)
 
 samples = []
-with open('./data/driving_log.csv') as csvfile:
+with open('./' + datadir + '/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     i = 0
     for line in reader:
@@ -31,7 +38,7 @@ def generator(samples, batch_size=32, flip_images=1):
             images = []
             angles = []
             for batch_sample in batch_samples:
-                name = './data/IMG/'+batch_sample[0].split('/')[-1]
+                name = './' + datadir + '/IMG/'+batch_sample[0].split('/')[-1]
                 center_image = cv2.imread(name)
                 center_angle = float(batch_sample[3])
                 images.append(center_image)
