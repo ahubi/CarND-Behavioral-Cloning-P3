@@ -76,7 +76,7 @@ validation_generator = generator(validation_samples, batch_size=32, flip_images=
 ch, row, col = 3, 160, 320
 # Use Nvidia model
 model = Sequential()
-model.add(Lambda(lambda x: x/127.5 - 1.,
+model.add(Lambda(lambda x: (x / 255.0) - 0.5,
                 input_shape=(row, col, ch),
                 output_shape=(row, col, ch)))
 model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(row, col, ch)))
@@ -93,6 +93,6 @@ model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam')
 hobj = model.fit_generator(train_generator, samples_per_epoch=len(train_samples), \
                     validation_data=validation_generator, \
-                    nb_val_samples=len(validation_samples), nb_epoch=7)
+                    nb_val_samples=len(validation_samples), nb_epoch=6)
 model.save('model.h5')
-plot_history_model(hobj, 'mse_model_loss.png')
+#plot_history_model(hobj, 'mse_model_loss.png')
