@@ -2,8 +2,13 @@ import os
 import csv
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D, Convolution2D
+from sklearn.model_selection import train_test_split
 import random
 import sys
+import matplotlib.pyplot as plt
+import cv2
+import numpy as np
+import sklearn
 
 datadir = 'data'
 if len(sys.argv) > 1:
@@ -21,12 +26,8 @@ with open('./' + datadir + '/driving_log.csv') as csvfile:
         i += 1
 
 
-from sklearn.model_selection import train_test_split
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
-import cv2
-import numpy as np
-import sklearn
 
 def generator(samples, batch_size=32, flip_images=1):
     num_samples = len(samples)
@@ -52,11 +53,28 @@ def generator(samples, batch_size=32, flip_images=1):
             y_train = np.array(angles)
             yield sklearn.utils.shuffle(X_train, y_train)
 
+def plot_history_model(history_object, stor2file=None):
+    ### print the keys contained in the history object
+    print(history_object.history.keys())
+
+    ### plot the training and validation loss for each epoch
+    plt.plot(history_object.history['loss'])
+    plt.plot(history_object.history['val_loss'])
+    plt.title('model mean squared error loss')
+    plt.ylabel('mean squared error loss')
+    plt.xlabel('epoch')
+    plt.legend(['training set', 'validation set'], loc='upper right')
+    if(stor2file!=None):
+        plt.savefig(stor2file)
+    plt.show()
+
+
 # compile and train the model using the generator function
 train_generator = generator(train_samples, batch_size=32, flip_images=1)
 validation_generator = generator(validation_samples, batch_size=32, flip_images=0)
 
-ch, row, col = 3, 160, 320  # Trimmed image format
+ch, row, col = 3, 160, 320
+# Use Nvidia model
 model = Sequential()
 model.add(Lambda(lambda x: x/127.5 - 1.,
                 input_shape=(row, col, ch),
@@ -73,7 +91,8 @@ model.add(Dense(50))
 model.add(Dense(10))
 model.add(Dense(1))
 model.compile(loss='mse', optimizer='adam')
-model.fit_generator(train_generator, samples_per_epoch=len(train_samples), \
+hobj = model.fit_generator(train_generator, samples_per_epoch=len(train_samples), \
                     validation_data=validation_generator, \
                     nb_val_samples=len(validation_samples), nb_epoch=7)
 model.save('model.h5')
+plot_history_model(hobj, 'mse_model_loss.png')
