@@ -148,4 +148,6 @@ I used this training data for training the model. The validation set helped dete
 
 ![alt text][image10]
 
+As can be seen in the diagram the MSE loss during training and validation goes down for at least the first 15 epochs. There is a change in the loss around 5th epoch, but then again the MSE loss continues to reduce. In my opinion the diagram shows that for the first 15 epochs an obvious overfitting isn't present.
+
 I used an adam optimizer so that manually training the learning rate wasn't necessary.
