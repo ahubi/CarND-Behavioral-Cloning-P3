@@ -69,9 +69,7 @@ The model used an adam optimizer, so the learning rate was not tuned manually (m
 
 ####4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used  only center camera images and augmented every training image by rotating it. In total 10000 images were recorded, total size of about 200 MB.
-
-For details about how I created the training data, see the next section.
+Training data was chosen to keep the vehicle driving on the road. I used  only center camera images and augmented every training image by rotating it. In total 10000 images were recorded, total size of about 200 MB. For details about how I created the training data, see the next section.
 
 ###Model Architecture and Training Strategy
 
@@ -88,7 +86,7 @@ To combat the overfitting and bad autonomous behavior of the car I decided to us
 The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track. Although track 1 can be considered as relatively easy there are still the following spots worth mentioning:
 
 * Sharp and long curves
-* Bridge with different pavements the the rest of track and different sites
+* Bridge with different pavements than the rest of track and different sites
 * Road shoulders with no line marking, but exit spots
 * Road shoulders with different line colors (white / grey)
 * Shadows from the trees and overhanging cables
@@ -118,7 +116,7 @@ Here is an example image of center lane driving:
 
 ![alt text][image5]
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to how to return to the center of the road when it drives to the site. These images show what a recovery looks like starting from left:
+I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn how to return to the center of the road when it drives to the site. These images show what a recovery looks like starting from left:
 
 ![alt text][image8]
 
@@ -127,7 +125,7 @@ and here is starting from right:
 ![alt text][image9]
 
 
-To augment the data sat, I also flipped images and angles thinking that this would the model more valuable input to train on. For example, here is an original image recorded by the center camera:
+To augment the data set, I flipped images and angles thinking that this would give the model more valuable input to train on. For example, here is an original image recorded by the center camera:
 
 ![alt text][image2]
 
@@ -135,19 +133,28 @@ and below is the flipped image:
 
 ![alt text][image3]
 
-to remove irrelevant information from the pictures a cropping Keras layer is added to the model. Below is the corresponding image:
+To remove irrelevant information from the pictures a cropping Keras layer is added to the model. Below is the corresponding image:
 
 ![alt text][image4]
 
 Additionally a Lamda layer is added to for image normalization.
-After the collection process, I had 10000 number of data points.
+After the collection process I had 10000 number of data points.
 
 I finally randomly shuffled the data set and put 20% of the data into a validation set.
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was starting with 6 as evidenced by the diagram of MSE model.
+I used training data for training the model. The validation set helped determine if the model was over or under fitting. I used an adam optimizer so that manually training the learning rate wasn't necessary.
+
+The minimum number of epochs was starting with 6  which were necessary to drive the car successfully the first track.
 
 ![alt text][image10]
 
-As can be seen in the diagram the MSE loss during training and validation goes down for at least the first 15 epochs. There is a change in the loss around 5th epoch, but then again the MSE loss continues to reduce. In my opinion the diagram shows that for the first 15 epochs an obvious overfitting isn't present. During my experiments I found out that starting with 6th epoch the car starts to drive autonomously staying on track. However I also observed that with 7 and 8 epochs I could create trained models which were not successful from time to time. In cases of not successful models the car didn't finish the full track autonomously and was driving offroad at some difficult passages.
+As can be seen in the diagram the MSE loss during training and validation goes down for at least the first 15 epochs. There is a change in the loss around 5th epoch, but then again the MSE loss continues to reduce. In my opinion the diagram shows that for the first 15 epochs an obvious overfitting isn't present. During my experiments I found out that starting with 6th epoch the car starts to drive autonomously staying on track. However I also observed that with 7 and 8 epochs I could create trained models which were not always successful. In cases of not successful models the car didn't finish the full track autonomously and was driving offroad at some difficult passages.
 
-I used an adam optimizer so that manually training the learning rate wasn't necessary.
+Here are some different experiments I did and tried driving on first track:
+
+* Use 3 Dropout layers with dropout parameter ranging from 0.5 to 0.3
+* Use one Dropout layer with dropout parameter of 0.3
+* Train model for 4 epochs only
+* Train model for 6, 7, 8, 10 epochs
+
+Adding a Dropout layer to Nvidia Model didn't help to reach better MSE loss results. Also autonomous driving of the car didn't show better results. Finally I decided to stay with original Nvidia model and 15 epochs of training.
